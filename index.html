@@ -80,19 +80,21 @@
           "Informe o professor.";
       }
 
-      // Detetar perda de foco da aba (mudança de aba, janela, minimizar, etc.)
-      document.addEventListener("visibilitychange", function () {
-        if (document.visibilityState === "hidden") {
-          anularTeste("a aba perdeu visibilidade (mudança de aba/janela)");
-        }
+      // ⚠️ Apenas quando a JANELA perde foco (ex.: mudou de aba, janela ou aplicação).
+      // Pequeno atraso para evitar falsos positivos (ex.: focar iframe/inputs).
+      window.addEventListener("blur", function () {
+        if (testeAnulado) return;
+
+        setTimeout(() => {
+          // Se após um “tick” a página realmente não tiver foco, então anulamos
+          if (!document.hasFocus()) {
+            anularTeste("a janela perdeu foco");
+          }
+        }, 150);
       });
 
-      // Opcional: detetar também perda de foco da janela
-      window.addEventListener("blur", function () {
-        if (!testeAnulado) {
-          anularTeste("a janela perdeu foco");
-        }
-      });
+      // 🚫 Removido: não usamos mais visibilitychange para permitir input na página/iframe
+      // document.addEventListener("visibilitychange", ...)
     </script>
   </body>
 </html>
